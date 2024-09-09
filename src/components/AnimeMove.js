@@ -8,25 +8,43 @@ import { FaComment, FaEye } from 'react-icons/fa';
 const AnimeMove = () => {
   const [animeList, setAnimeList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchAnime = async () => {
+    const fetchAnimeWithTimeout = async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 100); // 10 seconds timeout
+
       try {
-        const res = await fetch('https://api.jikan.moe/v4/anime?q=move&sfw');
+        const res = await fetch('https://api.jikan.moe/v4/anime?q=move&sfw', {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
         const data = await res.json();
 
         if (data.data && Array.isArray(data.data)) {
           setAnimeList(data.data.slice(0, 12));
+        } else {
+          setError('No anime found.');
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        if (error.name === 'AbortError') {
+          setError('Please Click on View All');
+        } else {
+          setError('Error fetching data: ' + error.message);
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAnime();
+    fetchAnimeWithTimeout();
   }, []);
 
   const handleCardClick = (id) => {
@@ -45,6 +63,8 @@ const AnimeMove = () => {
       </div>
       {loading ? (
         <p>Loading...</p>
+      ) : error ? (
+        <p>{error}</p>
       ) : animeList.length > 0 ? (
         <div className={styles.grid}>
           {animeList.map((anime) => (
@@ -76,7 +96,9 @@ const AnimeMove = () => {
           ))}
         </div>
       ) : (
-        <p>No anime found or unable to fetch data.</p>
+        <p>Please Go this way
+          <button className={styles.viewAllButton} onClick={handleViewAllClick}>View All</button>
+        </p>
       )}
     </div>
   );

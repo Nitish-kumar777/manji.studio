@@ -3,23 +3,21 @@ import styles from '@/app/page.module.css'
 import React from 'react'
 import TopAnime from '@/components/Top'
 import AnimeSlider from '@/components/AnimeSlider'
-import RecommendAnime from '@/components/Recommend'
 import AnimeMove from '@/components/AnimeMove'
 
 const page = () => {
   return (
     <>
       <div className={styles.slider}>
-        <AnimeSlider/>
+        <AnimeSlider />
       </div>
-    <div className={styles.main}>
-      <AnimePage/>
-      <TopAnime/>
-    </div>
-    <div className={styles.main2}>
-      <RecommendAnime/>
-      <AnimeMove/>
-    </div>
+      <div className={styles.main}>
+        <AnimePage />
+        <TopAnime />
+      </div>
+      <div className={styles.main2}>
+        <AnimeMove />
+      </div>
     </>
   )
 }
